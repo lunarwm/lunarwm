@@ -6,7 +6,7 @@ TARGET = lunarwm
 
 LIBS = -lX11 -lxcb
 
-SRC = main.c
+SRC = main.cpp
 
 all: $(TARGET)
 
