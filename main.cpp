@@ -161,7 +161,7 @@ public:
         root = RootWindow(dpy, scr);
 
         /* Create a window with a black border and white background */
-        win = XCreateSimpleWindow(dpy, root, POSX, POSY, WIDTH, HEIGHT, BORDER, BlackPixel(dpy, scr), WhitePixel(dpy, scr));
+        win = XCreateSimpleWindow(dpy, root, 200, 200, 800, 600, 4, BlackPixel(dpy, scr), WhitePixel(dpy, scr));
 
         /* Request the X server to send events */
         XSelectInput(dpy, win, ExposureMask | KeyPressMask | CreateNotify | DestroyNotify | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | PointerMotionHintMask | ConfigureRequest);
