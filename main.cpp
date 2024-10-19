@@ -100,7 +100,7 @@ void WindowManager::Frame(Window w, bool createdBeforeWindowManager)
         dpy,
         frame,
         SubstructureRedirectMask | SubstructureNotifyMask);
-    XAddToSaveSet(dpy, w);
+    // XAddToSaveSet(dpy, w);
     XReparentWindow(
         dpy,
         w,
@@ -145,7 +145,7 @@ void WindowManager::Unframe(Window w)
         w,
         root,
         0, 0);
-    XRemoveFromSaveSet(dpy, w);
+    // XRemoveFromSaveSet(dpy, w);
     XDestroyWindow(dpy, clients[w]);
     clients.erase(w);
 }
