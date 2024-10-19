@@ -11,8 +11,20 @@
 #include <string>
 #include <string>
 #include <unordered_map>
+#include <iostream>
 
 #define CHECK(X) if (!(X)) { fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, #X); }
+#define CHECK_EQ(expected, actual)                                           \
+  do {                                                                        \
+    auto &&_expected = (expected);                                            \
+    auto &&_actual = (actual);                                                \
+    if (_expected != _actual) {                                               \
+      std::cerr << __FILE__ << ":" << __LINE__ << ": Check failed: "         \
+                << #expected << " == " << #actual << " (" << _expected        \
+                << " vs. " << _actual << ")" << std::endl;                   \
+      abort();                                                                \
+    }                                                                         \
+  } while (0)
 
 class WindowManager {
 private:
@@ -30,12 +42,16 @@ private:
     void OnReperentNotify(const XReparentEvent& e);
     void OnConfigureRequest(const XConfigureRequestEvent& e);
     void OnMapRequest(const XMapRequestEvent& e);
-    void Frame(Window w);
+    void Frame(Window w, bool createdBeforeWindowManager);
     void OnUnmapNotify(const XUnmapEvent& e);
     void Unframe(Window w);
 
 public:
     WindowManager();
+    ~WindowManager()
+    {
+        XCloseDisplay(dpy);
+    }
     void run();
 };
 
