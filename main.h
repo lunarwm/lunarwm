@@ -1,19 +1,12 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-int POSX = 500;
-int POSY = 500;
-int WIDTH = 500;
-int HEIGHT = 500;
-int BORDER = 15;
-char* title = "LunarWM";
+#define POSX 200
+#define POSY 200
+#define WIDTH 800
+#define HEIGHT 600
+#define BORDER 4
 
-int main(int argc, char* argv[]);
-void grabKey(char *key, unsigned int mod);
-void OnCreateNotify(const XCreateWindowEvent& e);
-void OnDestroyNotify(const XDestroyWindowEvent& e);
-void OnExpose(const XExposeEvent& e);
-void OnKeyPress(const XKeyEvent& e);
-void OnReperentNotify(const XReparentEvent& e);
+#define CHECK(X) if (!(X)) { fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, #X); }
 
-#endif // MAIN_H
+#endif
