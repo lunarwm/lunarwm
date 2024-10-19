@@ -170,13 +170,15 @@ WindowManager::WindowManager()
     XGrabButton(dpy, Button1, 0, root, 0, ButtonPressMask, GrabModeSync,
                 GrabModeAsync, NULL, NULL);
 
+    /*
     if (OnWMDetected(dpy, NULL))
     {
         std::cout << "Detected another window manager on display " << XDisplayString(dpy) << "\n";
         return;
     }
-
+    */
     XSetErrorHandler(&WindowManager::OnXError);
+
 
     /* Sync the changes. */
     XSync(dpy, 0);
