@@ -33,6 +33,7 @@ private:
     Window root;
     Window win;
     std::unordered_map<Window, Window> clients;
+
     const char* title;
     void grabKey(std::string key, unsigned int mod);
     void OnCreateNotify(const XCreateWindowEvent& e);
@@ -45,6 +46,8 @@ private:
     void Frame(Window w, bool createdBeforeWindowManager);
     void OnUnmapNotify(const XUnmapEvent& e);
     void Unframe(Window w);
+    static int OnXError(Display* display, XErrorEvent* e);
+    bool OnWMDetected(Display* display, XErrorEvent* e);
 
 public:
     WindowManager();

@@ -4,7 +4,7 @@ CXXFLAGS = -g -O0
 
 TARGET = lunarwm
 
-LIBS = -lX11 -lxcb
+LIBS = -lX11
 
 SRC = main.cpp
 

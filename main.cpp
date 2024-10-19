@@ -65,7 +65,7 @@ void WindowManager::OnMapRequest(const XMapRequestEvent &e)
     XMapWindow(dpy, e.window);
 }
 
-/* Bording, handling input, crashes etc. */
+/* Border, handling input, crashes etc. */
 void WindowManager::Frame(Window w, bool createdBeforeWindowManager)
 {
     /* TODO Make border customisable */
@@ -170,6 +170,14 @@ WindowManager::WindowManager()
     XGrabButton(dpy, Button1, 0, root, 0, ButtonPressMask, GrabModeSync,
                 GrabModeAsync, NULL, NULL);
 
+    if (OnWMDetected(dpy, NULL))
+    {
+        std::cout << "Detected another window manager on display " << XDisplayString(dpy) << "\n";
+        return;
+    }
+
+    XSetErrorHandler(&WindowManager::OnXError);
+
     /* Sync the changes. */
     XSync(dpy, 0);
 
@@ -244,6 +252,24 @@ void WindowManager::run()
         }
     }
     XSync(dpy, 0);
+}
+
+
+bool WindowManager::OnWMDetected(Display* display, XErrorEvent* e)
+{
+    CHECK_EQ(static_cast<int>(e->error_code), BadAccess);
+    bool wmdetected = true;
+    return wmdetected;
+}
+
+int WindowManager::OnXError(Display* display, XErrorEvent* e) {
+  const int MAX_ERROR_TEXT_LENGTH = 1024;
+  char error_text[MAX_ERROR_TEXT_LENGTH];
+  XGetErrorText(display, e->error_code, error_text, sizeof(error_text));
+  std::cout << "Received X error:\n"
+             << "    Error code: " << int(e->error_code)
+             << " - " << error_text << "\n"
+             << "    Resource ID: " << e->resourceid;
 }
 
 int main(int argc, char *argv[])
