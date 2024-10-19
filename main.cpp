@@ -12,15 +12,16 @@
 #include <unordered_map>
 #include "main.h"
 
-class WindowManager {
+class WindowManager
+{
 private:
-    Display* dpy;
+    Display *dpy;
     int scr;
     Window root;
     Window win;
     std::unordered_map<Window, Window> clients;
-    const char* title = "LunarWM";
-        void grabKey(std::string key, unsigned int mod)
+    const char *title = "LunarWM";
+    void grabKey(std::string key, unsigned int mod)
     {
         KeySym sym = XStringToKeysym(key.c_str());
         KeyCode code = XKeysymToKeycode(dpy, sym);
@@ -28,33 +29,33 @@ private:
         XSync(dpy, 0);
     }
 
-    void OnCreateNotify(const XCreateWindowEvent& e)
+    void OnCreateNotify(const XCreateWindowEvent &e)
     {
         /* TODO: Implement */
     }
 
-    void OnDestroyNotify(const XDestroyWindowEvent& e)
+    void OnDestroyNotify(const XDestroyWindowEvent &e)
     {
         /* There's nothing needed to do */
     }
 
-    void OnExpose(const XExposeEvent& e)
+    void OnExpose(const XExposeEvent &e)
     {
         /* TODO: Implement */
     }
 
-    void OnKeyPress(const XKeyEvent& e)
+    void OnKeyPress(const XKeyEvent &e)
     {
         XAllowEvents(dpy, ReplayPointer, CurrentTime);
         XSync(dpy, 0);
     }
 
-    void OnReperentNotify(const XReparentEvent& e)
+    void OnReperentNotify(const XReparentEvent &e)
     {
         /* TODO: Implement */
     }
 
-    void OnConfigureRequest(const XConfigureRequestEvent& e)
+    void OnConfigureRequest(const XConfigureRequestEvent &e)
     {
         XWindowChanges changes;
         changes.x = e.x;
@@ -67,7 +68,7 @@ private:
         XConfigureWindow(dpy, e.window, e.value_mask, &changes);
     }
 
-    void OnMapRequest(const XMapRequestEvent& e)
+    void OnMapRequest(const XMapRequestEvent &e)
     {
         Frame(e.window);
         XMapWindow(dpy, e.window);
@@ -104,19 +105,19 @@ private:
             dpy,
             w,
             frame,
-            0, 0); 
+            0, 0);
         XMapWindow(dpy, frame);
         clients[w] = frame;
 
         /* Move windows with alt + left button. */
         XGrabButton(dpy, Button1, Mod1Mask, frame, True,
-                ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
-                GrabModeAsync, GrabModeAsync, None, None);
+                    ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
+                    GrabModeAsync, GrabModeAsync, None, None);
 
         /* Resize windows with alt + right button. */
         XGrabButton(dpy, Button3, Mod1Mask, frame, True,
-                ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
-                GrabModeAsync, GrabModeAsync, None, None);
+                    ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
+                    GrabModeAsync, GrabModeAsync, None, None);
 
         /* Kill windows with alt + f4. */
         grabKey("F4", Mod1Mask);
@@ -125,7 +126,7 @@ private:
         grabKey("Tab", Mod1Mask);
     }
 
-    void OnUnmapNotify(const XUnmapEvent& e)
+    void OnUnmapNotify(const XUnmapEvent &e)
     {
         /* If window not in clients ignore request */
         if (!clients.count(e.window))
@@ -140,23 +141,23 @@ private:
     {
         XUnmapWindow(dpy, clients[w]);
         XReparentWindow(
-        dpy,
-        w,
-        root,
-        0, 0);
+            dpy,
+            w,
+            root,
+            0, 0);
         XRemoveFromSaveSet(dpy, w);
         XDestroyWindow(dpy, clients[w]);
         clients.erase(w);
     }
 
-
 public:
-    WindowManager() {
+    WindowManager()
+    {
         /* Open the display */
         if ((dpy = XOpenDisplay(NULL)) == NULL)
             errx(1, "Cannot open display");
 
-        /* Get the default screen and root window */ 
+        /* Get the default screen and root window */
         scr = DefaultScreen(dpy);
         root = RootWindow(dpy, scr);
 
@@ -168,7 +169,7 @@ public:
 
         /* Tells X to send `ButtonPress` events on the root. */
         XGrabButton(dpy, Button1, 0, root, 0, ButtonPressMask, GrabModeSync,
-                GrabModeAsync, NULL, NULL);
+                    GrabModeAsync, NULL, NULL);
 
         /* Sync the changes. */
         XSync(dpy, 0);
@@ -185,47 +186,48 @@ public:
         XDefineCursor(dpy, root, cursor);
     }
 
-    void run() {
+    void run()
+    {
         XEvent e;
         for (;;)
         {
             XNextEvent(dpy, &e);
             switch (e.type)
             {
-                default:
-                    puts("Unexpected event");
-                    break;
-                case CreateNotify:
-                    OnCreateNotify(e.xcreatewindow);
-                    break;
-                case DestroyNotify:
-                    OnDestroyNotify(e.xdestroywindow);
-                    break;
-                case ReparentNotify:
-                    OnReperentNotify(e.xreparent);
-                    break;
-                case Expose:
-                    OnExpose(e.xexpose);
-                    break;
-                case KeyPress:
-                    OnKeyPress(e.xkey);
-                    break;
-                case ConfigureRequest:
-                    OnConfigureRequest(e.xconfigurerequest);
-                    break;
-                case UnmapNotify:
-                    OnUnmapNotify(e.xunmap);
-                    break;
-                case MapRequest:
-                    OnMapRequest(e.xmaprequest);
-                    break;
+            default:
+                puts("Unexpected event");
+                break;
+            case CreateNotify:
+                OnCreateNotify(e.xcreatewindow);
+                break;
+            case DestroyNotify:
+                OnDestroyNotify(e.xdestroywindow);
+                break;
+            case ReparentNotify:
+                OnReperentNotify(e.xreparent);
+                break;
+            case Expose:
+                OnExpose(e.xexpose);
+                break;
+            case KeyPress:
+                OnKeyPress(e.xkey);
+                break;
+            case ConfigureRequest:
+                OnConfigureRequest(e.xconfigurerequest);
+                break;
+            case UnmapNotify:
+                OnUnmapNotify(e.xunmap);
+                break;
+            case MapRequest:
+                OnMapRequest(e.xmaprequest);
+                break;
             }
-            }
-            XSync(dpy, 0);
         }
-    };
+        XSync(dpy, 0);
+    }
+};
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     WindowManager wm;
     wm.run();
