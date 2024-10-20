@@ -20,25 +20,36 @@ void WindowManager::grabKey(std::string key, unsigned int mod)
     XSync(dpy, 0);
 }
 
-void WindowManager::OnCreateNotify(const XCreateWindowEvent &e)
-{
-    /* TODO: Implement */
-}
+void WindowManager::OnCreateNotify(const XCreateWindowEvent &e) {}
 
-void WindowManager::OnDestroyNotify(const XDestroyWindowEvent &e)
-{
-    /* There's nothing needed to do */
-}
+void WindowManager::OnDestroyNotify(const XDestroyWindowEvent &e) {}
 
-void WindowManager::OnExpose(const XExposeEvent &e)
-{
-    /* TODO: Implement */
-}
+void WindowManager::OnExpose(const XExposeEvent &e) {}
 
 void WindowManager::OnKeyPress(const XKeyEvent &e)
 {
     XAllowEvents(dpy, ReplayPointer, CurrentTime);
     XSync(dpy, 0);
+}
+
+/* Raise window on click */
+void WindowManager::OnButtonPress(const XButtonEvent& e) {
+  CHECK(clients.count(e.window));
+  const Window frame = clients[e.window];
+
+  Window returned_root;
+  int x, y;
+  unsigned width, height, border_width, depth;
+  CHECK(XGetGeometry(
+      dpy,
+      frame,
+      &returned_root,
+      &x, &y,
+      &width, &height,
+      &border_width,
+      &depth));
+
+  XRaiseWindow(dpy, frame);
 }
 
 void WindowManager::OnReperentNotify(const XReparentEvent &e)
@@ -56,6 +67,11 @@ void WindowManager::OnConfigureRequest(const XConfigureRequestEvent &e)
     changes.border_width = e.border_width;
     changes.sibling = e.above;
     changes.stack_mode = e.detail;
+    if (clients.count(e.window))
+    {
+        const Window frame = clients[e.window];
+        XConfigureWindow(dpy, frame, e.value_mask, &changes);
+    }
     XConfigureWindow(dpy, e.window, e.value_mask, &changes);
 }
 
@@ -161,7 +177,7 @@ WindowManager::WindowManager()
     root = RootWindow(dpy, scr);
 
     /* Request the X server to send events */
-    XSelectInput(dpy, win, ExposureMask | KeyPressMask | CreateNotify | DestroyNotify | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | PointerMotionHintMask | ConfigureRequest);
+    XSelectInput(dpy, win, SubstructureRedirectMask | SubstructureNotifyMask);
 
     /* Tells X to send `ButtonPress` events on the root. */
     XGrabButton(dpy, Button1, 0, root, 0, ButtonPressMask, GrabModeSync,
@@ -247,6 +263,9 @@ void WindowManager::run()
             break;
         case MapRequest:
             OnMapRequest(e.xmaprequest);
+            break;
+        case ButtonPress:
+            OnButtonPress(e.xbutton);
             break;
         }
     }

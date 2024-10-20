@@ -48,6 +48,7 @@ private:
     void Unframe(Window w);
     static int OnXError(Display* display, XErrorEvent* e);
     bool OnWMDetected(Display* display, XErrorEvent* e);
+    void OnButtonPress(const XButtonEvent& e);
 
 public:
     WindowManager();
